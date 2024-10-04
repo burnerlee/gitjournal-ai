@@ -1,0 +1,130 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Vishesh Handa <me@vhanda.in>
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+import 'package:flutter/material.dart';
+import 'package:gitjournal/core/file/file.dart';
+import 'package:gitjournal/core/folder/notes_folder.dart';
+import 'package:gitjournal/core/folder/notes_folder_fs.dart';
+import 'package:gitjournal/l10n.dart';
+import 'package:gitjournal/repository.dart';
+import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
+
+class NoteFileTypesSettings extends StatefulWidget {
+  static const routePath = '/settings/fileTypes';
+
+  const NoteFileTypesSettings({super.key});
+
+  @override
+  State<NoteFileTypesSettings> createState() => _NoteFileTypesSettingsState();
+}
+
+class _FileTypeInfo {
+  final String ext;
+  int count;
+  bool enabled;
+
+  _FileTypeInfo(this.ext, this.count, this.enabled);
+}
+
+class _NoteFileTypesSettingsState extends State<NoteFileTypesSettings> {
+  List<_FileTypeInfo>? _info;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  List<_FileTypeInfo> _loadInfo() {
+    var root = context.watch<NotesFolderFS>();
+    var config = context.watch<NotesFolderConfig>();
+
+    var types = <String, int>{};
+    root.visit((File f) {
+      // Ignore Hidden files
+      if (f.fileName.startsWith('.')) {
+        return;
+      }
+      var ext = p.extension(f.fileName).toLowerCase();
+      if (types.containsKey(ext)) {
+        types[ext] = types[ext]! + 1;
+      } else {
+        types[ext] = 1;
+      }
+    });
+
+    var finalInfo = <_FileTypeInfo>[];
+    types.forEach((key, value) {
+      var enabled = config.allowedFileExts.contains(key);
+      finalInfo.add(_FileTypeInfo(key, value, enabled));
+    });
+    finalInfo.sort((a, b) => b.count.compareTo(a.count));
+    return finalInfo;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _info ??= _loadInfo();
+
+    // I need some text on the top to say what this does
+    var body = ListView(
+      children: _info!.map(_buildTile).toList(),
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.loc.settingsFileTypesTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: body,
+    );
+  }
+
+  Widget _buildTile(_FileTypeInfo info) {
+    var textTheme = Theme.of(context).textTheme;
+    var title = info.ext;
+    if (title.isEmpty) {
+      title = context.loc.settingsFileTypesNoExt;
+    }
+
+    return CheckboxListTile(
+      value: info.enabled,
+      title: Text(
+        title,
+        style: textTheme.titleMedium!.copyWith(fontFamily: "Roboto Mono"),
+      ),
+      secondary: Text(
+        context.loc.settingsFileTypesNumFiles(info.count),
+        style: textTheme.titleSmall,
+      ),
+      controlAffinity: ListTileControlAffinity.leading,
+      onChanged: (newVal) {
+        setState(() {
+          info.enabled = !info.enabled;
+        });
+
+        var config = context.read<NotesFolderConfig>();
+        if (!info.enabled) {
+          config.allowedFileExts.remove(info.ext);
+        } else {
+          config.allowedFileExts.add(info.ext);
+        }
+        config.save();
+
+        var repo = context.read<GitJournalRepo>();
+        repo.reloadNotes();
+      },
+    );
+  }
+}
+
+// FIXME: No matching editor found
+// FIXME: Draw a kind of histogram of the number of files

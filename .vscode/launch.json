@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dev Flavor",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Prod Flavor",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "No Flavor",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "WidgetBook Linux",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "deviceId": "linux",
+      "program": "lib/main.widgetbook.dart"
+    },
+    {
+      "name": "WidgetBook",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main.widgetbook.dart"
+    }
+  ]
+}
