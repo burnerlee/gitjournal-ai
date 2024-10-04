@@ -33,6 +33,8 @@ build_runner:
 test:
 	flutter test
 
+
+
 version:
 	./scripts/version.sh
 
