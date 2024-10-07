@@ -13,17 +13,17 @@ class Themes {
     colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.green,
     ).copyWith(
-      primary: const Color(0xFF66bb6a),
-      secondary: const Color(0xff6d4c41),
+      primary: const Color(0xFFFFFF00), // Changed to Yellow
+      secondary: const Color(0xff000000), // Changed to Black
       onPrimary: Colors.black,
     ),
     brightness: Brightness.light,
-    primaryColor: const Color(0xFF66bb6a),
-    primaryColorLight: const Color(0xFF98ee99),
-    primaryColorDark: const Color(0xFF338a3e),
+    primaryColor: const Color(0xFFFFFF00), // Changed to Yellow
+    primaryColorLight: const Color(0xFFFFFFE0), // Light Yellow
+    primaryColorDark: const Color(0xFFCCCC00), // Darker Yellow
     textSelectionTheme: TextSelectionThemeData(
-      cursorColor: const Color(0xFF338a3e),
-      selectionHandleColor: const Color(0xFF66bb6a),
+      cursorColor: const Color(0xFFCCCC00), // Darker Yellow
+      selectionHandleColor: const Color(0xFFFFFF00), // Yellow
       selectionColor: Colors.grey[400],
     ),
     pageTransitionsTheme: const PageTransitionsTheme(builders: {
